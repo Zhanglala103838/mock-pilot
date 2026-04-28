@@ -90,12 +90,22 @@ const OCCUPATIONS = ["产品经理", "前端工程师", "运营专员", "财务�
 const EMAIL_DOMAINS = ["example.cn", "mockmail.cn", "testdata.cn", "demo.cn"];
 const ID_WEIGHTS = [7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2];
 const ID_CHECK_CODES = ["1", "0", "X", "9", "8", "7", "6", "5", "4", "3", "2"];
+const IMAGE_MIN_SIZE = 16;
+const IMAGE_MAX_SIZE = 4096;
 
 const state = {
   records: [],
+  uuidRecords: [],
+  image: {
+    width: 800,
+    height: 450,
+    label: "",
+  },
   selectedFields: FIELD_DEFINITIONS.filter((field) => field.default).map((field) => field.key),
 };
 
+const tabs = document.querySelectorAll(".tool-tab");
+const panels = document.querySelectorAll(".tool-panel");
 const fieldOptions = document.querySelector("#field-options");
 const controlForm = document.querySelector("#control-form");
 const recordCountInput = document.querySelector("#record-count");
@@ -111,14 +121,40 @@ const toast = document.querySelector("#toast");
 const copyJsonButton = document.querySelector("#copy-json");
 const copyCsvButton = document.querySelector("#copy-csv");
 const downloadCsvButton = document.querySelector("#download-csv");
+const uuidForm = document.querySelector("#uuid-form");
+const uuidCountInput = document.querySelector("#uuid-count");
+const uuidUppercaseInput = document.querySelector("#uuid-uppercase");
+const uuidCompactInput = document.querySelector("#uuid-compact");
+const uuidTableWrap = document.querySelector("#uuid-table-wrap");
+const uuidJsonOutput = document.querySelector("#uuid-json-output");
+const uuidSummaryCount = document.querySelector("#uuid-summary-count");
+const uuidSummaryFormat = document.querySelector("#uuid-summary-format");
+const copyUuidListButton = document.querySelector("#copy-uuid-list");
+const copyUuidJsonButton = document.querySelector("#copy-uuid-json");
+const downloadUuidTxtButton = document.querySelector("#download-uuid-txt");
+const imageForm = document.querySelector("#image-form");
+const imageWidthInput = document.querySelector("#image-width");
+const imageHeightInput = document.querySelector("#image-height");
+const imageLabelInput = document.querySelector("#image-label");
+const imageSummarySize = document.querySelector("#image-summary-size");
+const mockImageCanvas = document.querySelector("#mock-image-canvas");
+const downloadImageButton = document.querySelector("#download-image");
 
 function init() {
   renderFieldOptions();
   bindEvents();
-  generateRecords();
+  setActiveTab("personal");
+  generateRecords({ silent: true });
+  generateUuidRecords({ silent: true });
+  renderMockImage({ silent: true });
 }
 
 function bindEvents() {
+  tabs.forEach((tab) => {
+    tab.addEventListener("click", () => setActiveTab(tab.dataset.tab));
+    tab.addEventListener("keydown", handleTabKeydown);
+  });
+
   controlForm.addEventListener("submit", (event) => {
     event.preventDefault();
     generateRecords();
@@ -128,15 +164,8 @@ function bindEvents() {
     generateRecords({ silent: true });
   });
 
-  tableWrap.addEventListener("click", (event) => {
-    const copyButton = event.target.closest(".cell-copy");
-
-    if (!copyButton) {
-      return;
-    }
-
-    copyText(copyButton.dataset.copy ?? "", `${copyButton.dataset.label ?? "内容"} 已复制`);
-  });
+  bindCellCopy(tableWrap);
+  bindCellCopy(uuidTableWrap);
 
   nameTestSuffixInput.addEventListener("change", () => {
     generateRecords({ silent: true });
@@ -149,6 +178,94 @@ function bindEvents() {
   copyJsonButton.addEventListener("click", () => copyText(JSON.stringify(state.records, null, 2), "JSON 已复制"));
   copyCsvButton.addEventListener("click", () => copyText(toCsv(state.records), "CSV 已复制"));
   downloadCsvButton.addEventListener("click", downloadCsv);
+
+  uuidForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    generateUuidRecords();
+  });
+
+  uuidUppercaseInput.addEventListener("change", () => generateUuidRecords({ silent: true }));
+  uuidCompactInput.addEventListener("change", () => generateUuidRecords({ silent: true }));
+  copyUuidListButton.addEventListener("click", () => copyText(toUuidList(state.uuidRecords), "UUID 列表已复制"));
+  copyUuidJsonButton.addEventListener("click", () => copyText(JSON.stringify(state.uuidRecords, null, 2), "UUID JSON 已复制"));
+  downloadUuidTxtButton.addEventListener("click", downloadUuidTxt);
+
+  imageForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    renderMockImage();
+  });
+
+  [imageWidthInput, imageHeightInput].forEach((input) => {
+    input.addEventListener("blur", () => renderMockImage({ silent: true }));
+    input.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        renderMockImage();
+      }
+    });
+  });
+
+  imageLabelInput.addEventListener("input", updateMockImageLabel);
+  downloadImageButton.addEventListener("click", downloadMockImage);
+  window.addEventListener("resize", () => syncMockImagePreviewSize());
+}
+
+function bindCellCopy(container) {
+  container.addEventListener("click", (event) => {
+    const copyButton = event.target.closest(".cell-copy");
+
+    if (!copyButton) {
+      return;
+    }
+
+    copyText(copyButton.dataset.copy ?? "", `${copyButton.dataset.label ?? "内容"} 已复制`);
+  });
+}
+
+function setActiveTab(activeTab) {
+  tabs.forEach((tab) => {
+    const isActive = tab.dataset.tab === activeTab;
+    tab.classList.toggle("is-active", isActive);
+    tab.setAttribute("aria-selected", String(isActive));
+    tab.tabIndex = isActive ? 0 : -1;
+  });
+
+  panels.forEach((panel) => {
+    const isActive = panel.id === `panel-${activeTab}`;
+    panel.classList.toggle("is-active", isActive);
+    panel.hidden = !isActive;
+  });
+
+  if (activeTab === "image") {
+    window.requestAnimationFrame(() => syncMockImagePreviewSize());
+  }
+}
+
+function handleTabKeydown(event) {
+  const keys = ["ArrowLeft", "ArrowRight", "Home", "End"];
+
+  if (!keys.includes(event.key)) {
+    return;
+  }
+
+  event.preventDefault();
+  const tabList = Array.from(tabs);
+  const currentIndex = tabList.indexOf(event.currentTarget);
+  let nextIndex = currentIndex;
+
+  if (event.key === "ArrowLeft") {
+    nextIndex = (currentIndex - 1 + tabList.length) % tabList.length;
+  } else if (event.key === "ArrowRight") {
+    nextIndex = (currentIndex + 1) % tabList.length;
+  } else if (event.key === "Home") {
+    nextIndex = 0;
+  } else if (event.key === "End") {
+    nextIndex = tabList.length - 1;
+  }
+
+  const nextTab = tabList[nextIndex];
+  setActiveTab(nextTab.dataset.tab);
+  nextTab.focus();
 }
 
 function renderFieldOptions() {
@@ -357,6 +474,115 @@ function render() {
   updateActionState();
 }
 
+function generateUuidRecords({ silent = false } = {}) {
+  const count = clamp(Number(uuidCountInput.value) || 20, 1, 500);
+  uuidCountInput.value = String(count);
+
+  state.uuidRecords = Array.from({ length: count }, () => ({
+    uuid: formatUuid(createUuid()),
+  }));
+
+  renderUuid();
+  if (!silent) {
+    showToast(`已生成 ${count} 个 UUID`);
+  }
+}
+
+function renderUuid() {
+  uuidSummaryCount.textContent = `${state.uuidRecords.length} 个 UUID`;
+  uuidSummaryFormat.textContent = getUuidFormatLabel();
+  uuidJsonOutput.textContent = JSON.stringify(state.uuidRecords, null, 2);
+  renderUuidTable();
+  updateActionState();
+}
+
+function renderUuidTable() {
+  if (state.uuidRecords.length === 0) {
+    uuidTableWrap.innerHTML = `
+      <div class="empty-state">
+        <p class="empty-state__title">还没有 UUID</p>
+        <p>点击“生成 UUID”，这里会展示可复制的 UUID 列表。</p>
+      </div>
+    `;
+    return;
+  }
+
+  const rows = state.uuidRecords.map((record, index) => `
+    <tr>
+      <td data-label="序号">${index + 1}</td>
+      <td data-label="UUID">
+        <span class="cell-content">
+          <span class="cell-value">${escapeHtml(record.uuid)}</span>
+          <button
+            class="cell-copy"
+            type="button"
+            data-copy="${escapeHtml(record.uuid)}"
+            data-label="UUID"
+            aria-label="复制 UUID"
+            title="复制 UUID"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M9 9h10v10H9z"></path>
+              <path d="M5 15H4V4h11v1"></path>
+            </svg>
+          </button>
+        </span>
+      </td>
+    </tr>
+  `).join("");
+
+  uuidTableWrap.innerHTML = `
+    <table class="uuid-table">
+      <thead>
+        <tr>
+          <th scope="col">序号</th>
+          <th scope="col">UUID</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>
+  `;
+}
+
+function createUuid() {
+  if (window.crypto?.randomUUID) {
+    return window.crypto.randomUUID();
+  }
+
+  const bytes = getRandomBytes(16);
+  bytes[6] = (bytes[6] & 0x0f) | 0x40;
+  bytes[8] = (bytes[8] & 0x3f) | 0x80;
+
+  const hex = Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0")).join("");
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+}
+
+function getRandomBytes(length) {
+  const bytes = new Uint8Array(length);
+
+  if (window.crypto?.getRandomValues) {
+    window.crypto.getRandomValues(bytes);
+    return bytes;
+  }
+
+  return bytes.map(() => randomInt(0, 255));
+}
+
+function formatUuid(uuid) {
+  const compacted = uuidCompactInput.checked ? uuid.replaceAll("-", "") : uuid;
+  return uuidUppercaseInput.checked ? compacted.toUpperCase() : compacted;
+}
+
+function getUuidFormatLabel() {
+  const caseLabel = uuidUppercaseInput.checked ? "大写" : "小写";
+  const shapeLabel = uuidCompactInput.checked ? "32 位无连字符" : "标准连字符格式";
+  return `${caseLabel} · ${shapeLabel}`;
+}
+
+function toUuidList(records) {
+  return records.map((record) => record.uuid).join("\n");
+}
+
 function renderSummary() {
   const selectedLabels = state.selectedFields.map(getFieldLabel);
   summaryCount.textContent = `${state.records.length} 条记录`;
@@ -417,9 +643,13 @@ function renderTable() {
 
 function updateActionState() {
   const hasRecords = state.records.length > 0;
+  const hasUuids = state.uuidRecords.length > 0;
   copyJsonButton.disabled = !hasRecords;
   copyCsvButton.disabled = !hasRecords;
   downloadCsvButton.disabled = !hasRecords;
+  copyUuidListButton.disabled = !hasUuids;
+  copyUuidJsonButton.disabled = !hasUuids;
+  downloadUuidTxtButton.disabled = !hasUuids;
 }
 
 async function copyText(text, successMessage) {
@@ -467,6 +697,205 @@ function downloadCsv() {
   link.click();
   URL.revokeObjectURL(url);
   showToast("CSV 文件已生成");
+}
+
+function downloadUuidTxt() {
+  if (state.uuidRecords.length === 0) {
+    showToast("当前没有可下载的 UUID");
+    return;
+  }
+
+  const blob = new Blob([toUuidList(state.uuidRecords)], { type: "text/plain;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `mock-uuids-${Date.now()}.txt`;
+  link.click();
+  URL.revokeObjectURL(url);
+  showToast("UUID TXT 文件已生成");
+}
+
+function renderMockImage({ silent = false } = {}) {
+  const width = normalizeImageDimension(imageWidthInput, state.image.width);
+  const height = normalizeImageDimension(imageHeightInput, state.image.height);
+  const label = imageLabelInput.value.trim();
+
+  state.image = { width, height, label };
+
+  drawMockImage(width, height, label || `${width} x ${height}`);
+  imageSummarySize.textContent = `${width} x ${height} PNG`;
+
+  if (!silent) {
+    showToast("图片预览已更新");
+  }
+}
+
+function normalizeImageDimension(input, fallback) {
+  const numericValue = Number(input.value);
+  const nextValue = Number.isFinite(numericValue)
+    ? clamp(Math.round(numericValue), IMAGE_MIN_SIZE, IMAGE_MAX_SIZE)
+    : fallback;
+
+  input.value = String(nextValue);
+  return nextValue;
+}
+
+function updateMockImageLabel() {
+  state.image.label = imageLabelInput.value.trim();
+  drawMockImage(state.image.width, state.image.height, state.image.label || `${state.image.width} x ${state.image.height}`);
+}
+
+function drawMockImage(width, height, label) {
+  const canvas = mockImageCanvas;
+  const ctx = canvas.getContext("2d");
+  canvas.width = width;
+  canvas.height = height;
+  canvas.style.aspectRatio = `${width} / ${height}`;
+  canvas.classList.toggle("is-low-resolution", width < 180 || height < 180);
+
+  ctx.clearRect(0, 0, width, height);
+  ctx.fillStyle = "#eef1f4";
+  ctx.fillRect(0, 0, width, height);
+
+  if (width >= 96 && height >= 96) {
+    drawSkeletonPattern(ctx, width, height);
+  }
+  drawImageLabel(ctx, width, height, label);
+  syncMockImagePreviewSize(width, height);
+}
+
+function syncMockImagePreviewSize(width = state.image.width, height = state.image.height) {
+  const shell = mockImageCanvas.closest(".image-preview-shell");
+  const shellWidth = shell?.clientWidth || 960;
+  const maxPreviewWidth = Math.max(IMAGE_MIN_SIZE, Math.min(shellWidth - 64, 928));
+  const maxPreviewHeight = 560;
+  const fitScale = Math.min(maxPreviewWidth / width, maxPreviewHeight / height, 1);
+  let scale = fitScale;
+
+  if (width < 180 && height < 180) {
+    const targetSize = width <= 32 || height <= 32 ? 160 : 220;
+    scale = Math.min(maxPreviewWidth / width, maxPreviewHeight / height, targetSize / Math.max(width, height));
+    scale = Math.max(1, scale);
+  }
+
+  mockImageCanvas.style.width = `${Math.round(width * scale)}px`;
+  mockImageCanvas.style.height = "auto";
+}
+
+function drawSkeletonPattern(ctx, width, height) {
+  const unit = Math.max(8, Math.min(width, height) * 0.035);
+  const margin = unit * 2.2;
+  const radius = Math.max(4, unit * 0.55);
+  const topHeight = Math.max(unit * 2.2, height * 0.14);
+  const blockColor = "rgba(210, 217, 226, 0.92)";
+  const softBlockColor = "rgba(226, 231, 237, 0.95)";
+
+  ctx.fillStyle = "#f7f9fb";
+  roundRect(ctx, margin, margin, Math.max(unit * 3, width - margin * 2), topHeight, radius);
+  ctx.fill();
+
+  ctx.fillStyle = blockColor;
+  roundRect(ctx, margin * 1.45, margin * 1.55, topHeight * 0.48, topHeight * 0.48, topHeight * 0.24);
+  ctx.fill();
+
+  ctx.fillStyle = softBlockColor;
+  roundRect(ctx, margin * 1.45 + topHeight * 0.68, margin * 1.65, Math.max(unit * 6, width * 0.28), unit * 0.9, radius);
+  ctx.fill();
+  roundRect(ctx, margin * 1.45 + topHeight * 0.68, margin * 2.25, Math.max(unit * 5, width * 0.18), unit * 0.72, radius);
+  ctx.fill();
+
+  const cardTop = margin * 2 + topHeight;
+  const availableWidth = width - margin * 2;
+  const gap = unit;
+  const columns = width >= 720 ? 3 : width >= 420 ? 2 : 1;
+  const cardWidth = (availableWidth - gap * (columns - 1)) / columns;
+  const cardHeight = Math.max(unit * 5.2, (height - cardTop - margin) * 0.38);
+
+  for (let index = 0; index < columns; index += 1) {
+    const x = margin + index * (cardWidth + gap);
+    const y = cardTop;
+    ctx.fillStyle = "#f8fafc";
+    roundRect(ctx, x, y, cardWidth, cardHeight, radius);
+    ctx.fill();
+
+    ctx.fillStyle = blockColor;
+    roundRect(ctx, x + unit, y + unit, cardWidth - unit * 2, Math.max(unit * 1.7, cardHeight * 0.32), radius);
+    ctx.fill();
+
+    ctx.fillStyle = softBlockColor;
+    roundRect(ctx, x + unit, y + cardHeight * 0.52, cardWidth * 0.68, unit * 0.75, radius);
+    ctx.fill();
+    roundRect(ctx, x + unit, y + cardHeight * 0.66, cardWidth * 0.48, unit * 0.65, radius);
+    ctx.fill();
+  }
+
+  const bandY = Math.min(height - margin - unit * 2, cardTop + cardHeight + unit * 1.6);
+  ctx.fillStyle = "rgba(245, 247, 250, 0.82)";
+  roundRect(ctx, margin, bandY, availableWidth, Math.max(unit * 2, height * 0.08), radius);
+  ctx.fill();
+}
+
+function drawImageLabel(ctx, width, height, label) {
+  const shortSide = Math.min(width, height);
+  const maxTextWidth = width * 0.78;
+  const displayLabel = shortSide < 64 ? label.replaceAll(" ", "") : label;
+  let fontSize = clamp(Math.floor(shortSide * 0.13), 4, 96);
+
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.font = `850 ${fontSize}px PingFang SC, Microsoft YaHei UI, sans-serif`;
+
+  while (ctx.measureText(displayLabel).width > maxTextWidth && fontSize > 4) {
+    fontSize -= 1;
+    ctx.font = `850 ${fontSize}px PingFang SC, Microsoft YaHei UI, sans-serif`;
+  }
+
+  const paddingX = Math.max(2, fontSize * 0.8);
+  const labelWidth = Math.min(width * 0.92, ctx.measureText(displayLabel).width + paddingX * 2);
+  const labelHeight = Math.min(height * 0.82, fontSize * 1.72);
+  const labelX = (width - labelWidth) / 2;
+  const labelY = (height - labelHeight) / 2;
+
+  ctx.fillStyle = "rgba(248, 250, 252, 0.86)";
+  roundRect(ctx, labelX, labelY, labelWidth, labelHeight, Math.max(6, fontSize * 0.22));
+  ctx.fill();
+
+  ctx.fillStyle = "#66717f";
+  ctx.fillText(displayLabel, width / 2, height / 2 + fontSize * 0.02, width * 0.84);
+}
+
+function roundRect(ctx, x, y, width, height, radius) {
+  const safeRadius = Math.min(radius, width / 2, height / 2);
+  ctx.beginPath();
+  ctx.moveTo(x + safeRadius, y);
+  ctx.lineTo(x + width - safeRadius, y);
+  ctx.quadraticCurveTo(x + width, y, x + width, y + safeRadius);
+  ctx.lineTo(x + width, y + height - safeRadius);
+  ctx.quadraticCurveTo(x + width, y + height, x + width - safeRadius, y + height);
+  ctx.lineTo(x + safeRadius, y + height);
+  ctx.quadraticCurveTo(x, y + height, x, y + height - safeRadius);
+  ctx.lineTo(x, y + safeRadius);
+  ctx.quadraticCurveTo(x, y, x + safeRadius, y);
+  ctx.closePath();
+}
+
+function downloadMockImage() {
+  renderMockImage({ silent: true });
+
+  mockImageCanvas.toBlob((blob) => {
+    if (!blob) {
+      showToast("图片生成失败");
+      return;
+    }
+
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `mock-image-${state.image.width}x${state.image.height}.png`;
+    link.click();
+    URL.revokeObjectURL(url);
+    showToast("PNG 图片已生成");
+  }, "image/png");
 }
 
 function toCsv(records) {

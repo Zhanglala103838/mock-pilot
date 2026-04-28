@@ -104,6 +104,13 @@ summary:focus-visible {
   animation: rise-in 700ms var(--ease-out) both;
 }
 
+.hero--lower {
+  margin-top: var(--space-7);
+  margin-bottom: 0;
+  padding-top: var(--space-7);
+  border-top: 1px solid var(--line);
+}
+
 .hero__copy {
   max-width: 68rem;
 }
@@ -164,6 +171,39 @@ h2 {
 .workspace {
   display: grid;
   gap: var(--space-5);
+}
+
+.tool-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-5);
+  border-bottom: 1px solid var(--line);
+  animation: rise-in 700ms var(--ease-out) 40ms both;
+}
+
+.tool-tab {
+  min-height: 3rem;
+  border: 1px solid var(--line);
+  border-bottom: 0;
+  background: oklch(95% 0.024 83);
+  color: var(--muted);
+  padding: 0.7rem 1.15rem;
+  font-weight: 900;
+  transition: transform 160ms var(--ease-out), background 160ms var(--ease-out), color 160ms var(--ease-out);
+}
+
+.tool-tab.is-active {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.tool-panel[hidden] {
+  display: none;
+}
+
+.tool-panel.is-active {
+  animation: rise-in 520ms var(--ease-out) both;
 }
 
 .control-panel,
@@ -304,6 +344,37 @@ h2 {
   grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
   gap: var(--space-3);
   margin-top: var(--space-5);
+}
+
+.settings-grid--uuid {
+  grid-template-columns: 1fr;
+  align-items: stretch;
+}
+
+.settings-grid--uuid .input-field,
+.settings-grid--uuid .switch-field {
+  min-height: 5.2rem;
+  border: 1px solid var(--line);
+  background: var(--surface-raised);
+  padding: var(--space-3) var(--space-4);
+}
+
+.settings-grid--uuid .input-field {
+  align-content: center;
+  gap: 0.2rem;
+}
+
+.settings-grid--uuid .input-field input {
+  min-height: auto;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  color: var(--ink);
+  font-size: 1rem;
+}
+
+.settings-grid--uuid .switch-field {
+  align-items: center;
 }
 
 .input-field {
@@ -447,6 +518,15 @@ table {
   font-variant-numeric: tabular-nums;
 }
 
+.uuid-table {
+  min-width: 34rem;
+}
+
+.uuid-table th:first-child,
+.uuid-table td:first-child {
+  width: 5.5rem;
+}
+
 th,
 td {
   border-bottom: 1px solid var(--line);
@@ -534,6 +614,38 @@ tbody tr:nth-child(even) td {
   background: oklch(95% 0.022 83);
 }
 
+.image-result-panel {
+  min-width: 0;
+}
+
+.image-preview-shell {
+  display: grid;
+  place-items: center;
+  overflow: auto;
+  min-height: clamp(18rem, 44vw, 36rem);
+  border: 1px solid var(--line);
+  background:
+    linear-gradient(45deg, oklch(91% 0.018 83) 25%, transparent 25%),
+    linear-gradient(-45deg, oklch(91% 0.018 83) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, oklch(91% 0.018 83) 75%),
+    linear-gradient(-45deg, transparent 75%, oklch(91% 0.018 83) 75%),
+    oklch(97% 0.014 83);
+  background-position: 0 0, 0 8px, 8px -8px, -8px 0;
+  background-size: 16px 16px;
+  padding: clamp(1rem, 3vw, 2rem);
+}
+
+#mock-image-canvas {
+  display: block;
+  max-width: 100%;
+  border: 1px solid oklch(76% 0.04 80);
+  box-shadow: 0 20px 52px oklch(30% 0.04 58 / 16%);
+}
+
+#mock-image-canvas.is-low-resolution {
+  image-rendering: pixelated;
+}
+
 .json-drawer summary {
   min-height: 2.9rem;
   padding: var(--space-3) var(--space-4);
@@ -586,9 +698,15 @@ pre {
 
 @media (hover: hover) {
   .field-option:hover span,
+  .tool-tab:hover,
   .ghost-button:not(:disabled):hover,
   .generate-button:not(:disabled):hover {
     transform: translateY(-2px);
+  }
+
+  .tool-tab:not(.is-active):hover {
+    background: oklch(91% 0.035 80);
+    color: var(--ink);
   }
 
   .ghost-button:not(:disabled):hover {
@@ -634,6 +752,17 @@ pre {
 }
 
 @media (max-width: 640px) {
+  .tool-tabs {
+    display: grid;
+    grid-template-columns: 1fr;
+    border-bottom: 0;
+  }
+
+  .tool-tab {
+    width: 100%;
+    border: 1px solid var(--line);
+  }
+
   .result-actions,
   .quick-actions {
     display: grid;
