@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="description" content="按勾选字段生成中国大陆规范的 mock 用户信息。">
+    <title>Mock Pilot | 大陆用户信息生成器</title>
+    <link rel="stylesheet" href="./styles.css">
+  </head>
+  <body>
+    <a class="skip-link" href="#generator">跳到生成器</a>
+
+    <main class="app-shell">
+      <section class="hero" aria-labelledby="page-title">
+        <div class="hero__copy">
+          <p class="eyebrow">Mock Pilot / CN Identity Lab</p>
+          <h1 id="page-title">按字段拼装一份可信的测试用户档案</h1>
+          <p class="hero__lead">
+            勾选需要的类目，生成符合中国大陆常见格式的 mock 数据。适合表单测试、Demo 演示和原型填充，不对应真实个人。
+          </p>
+        </div>
+        <div class="hero__seal" aria-hidden="true">
+          <span>虚拟</span>
+          <span>样本</span>
+        </div>
+      </section>
+
+      <section class="workspace" id="generator">
+        <form class="control-panel" id="control-form">
+          <div class="panel-heading">
+            <p class="eyebrow">字段清单</p>
+            <h2>选择你要生成的信息</h2>
+          </div>
+
+          <fieldset class="field-grid" id="field-options">
+            <legend class="sr-only">可生成字段</legend>
+          </fieldset>
+
+          <div class="quick-actions" aria-label="快速选择字段">
+            <button class="ghost-button" type="button" data-preset="core">常用四项</button>
+            <button class="ghost-button" type="button" data-preset="full">全量档案</button>
+            <button class="ghost-button" type="button" data-preset="clear">清空</button>
+          </div>
+
+          <div class="settings-grid">
+            <label class="input-field" for="record-count">
+              <span>生成数量</span>
+              <input id="record-count" name="recordCount" type="number" min="1" max="200" value="10" inputmode="numeric">
+            </label>
+
+            <label class="input-field" for="gender-mode">
+              <span>性别策略</span>
+              <select id="gender-mode" name="genderMode">
+                <option value="random">随机</option>
+                <option value="男">男</option>
+                <option value="女">女</option>
+              </select>
+            </label>
+
+            <label class="input-field" for="birth-start">
+              <span>最早出生日期</span>
+              <input id="birth-start" name="birthStart" type="date" value="1980-01-01">
+            </label>
+
+            <label class="input-field" for="birth-end">
+              <span>最晚出生日期</span>
+              <input id="birth-end" name="birthEnd" type="date" value="2005-12-31">
+            </label>
+
+            <label class="switch-field" for="name-test-suffix">
+              <input id="name-test-suffix" name="nameTestSuffix" type="checkbox">
+              <span class="switch-field__copy">
+                <strong>姓名后追加 (测)</strong>
+                <small>只影响姓名字段，邮箱仍用原始姓名生成。</small>
+              </span>
+              <span class="switch-field__track" aria-hidden="true"></span>
+            </label>
+          </div>
+
+          <p class="form-note" id="form-note">
+            手机号为 11 位大陆移动号码格式；身份证号使用 GB 11643 校验位算法生成。
+          </p>
+
+          <button class="generate-button" type="submit">
+            生成用户信息
+            <span aria-hidden="true">→</span>
+          </button>
+        </form>
+
+        <section class="result-panel" aria-labelledby="result-title">
+          <div class="result-header">
+            <div>
+              <p class="eyebrow">输出结果</p>
+              <h2 id="result-title">数据预览</h2>
+            </div>
+            <div class="result-actions">
+              <button class="ghost-button" type="button" id="copy-json">复制 JSON</button>
+              <button class="ghost-button" type="button" id="copy-csv">复制 CSV</button>
+              <button class="ghost-button" type="button" id="download-csv">下载 CSV</button>
+            </div>
+          </div>
+
+          <div class="summary-strip" aria-live="polite">
+            <span id="summary-count">0 条记录</span>
+            <span id="summary-fields">未选择字段</span>
+          </div>
+
+          <div class="table-wrap" id="table-wrap">
+            <div class="empty-state">
+              <p class="empty-state__title">还没有生成数据</p>
+              <p>选择字段后点击“生成用户信息”，这里会展示表格和 JSON。</p>
+            </div>
+          </div>
+
+          <details class="json-drawer" open>
+            <summary>JSON 原文</summary>
+            <pre id="json-output">[]</pre>
+          </details>
+        </section>
+      </section>
+    </main>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <script src="./app.js" defer></script>
+  </body>
+</html>
