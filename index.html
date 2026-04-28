@@ -15,6 +15,10 @@
         <button class="tool-tab is-active" id="tab-personal" type="button" role="tab" aria-selected="true" aria-controls="panel-personal" data-tab="personal">个人 Mock</button>
         <button class="tool-tab" id="tab-uuid" type="button" role="tab" aria-selected="false" aria-controls="panel-uuid" data-tab="uuid">UUID Mock</button>
         <button class="tool-tab" id="tab-image" type="button" role="tab" aria-selected="false" aria-controls="panel-image" data-tab="image">图片 Mock</button>
+        <button class="tool-tab" id="tab-general" type="button" role="tab" aria-selected="false" aria-controls="panel-general" data-tab="general">通用 Mock</button>
+        <button class="tool-tab" id="tab-account" type="button" role="tab" aria-selected="false" aria-controls="panel-account" data-tab="account">账号 Mock</button>
+        <button class="tool-tab" id="tab-business" type="button" role="tab" aria-selected="false" aria-controls="panel-business" data-tab="business">业务 Mock</button>
+        <button class="tool-tab" id="tab-api" type="button" role="tab" aria-selected="false" aria-controls="panel-api" data-tab="api">接口 Mock</button>
       </div>
 
       <section class="workspace tool-panel is-active" id="panel-personal" role="tabpanel" aria-labelledby="tab-personal">
@@ -205,6 +209,24 @@
               <span>图片文字</span>
               <input id="image-label" name="imageLabel" type="text" maxlength="36" placeholder="默认显示尺寸">
             </label>
+
+            <fieldset class="shape-field" id="image-shape-options">
+              <legend>图片形状</legend>
+              <div class="shape-options">
+                <label class="shape-option">
+                  <input type="radio" name="imageShape" value="rectangle" checked>
+                  <span>矩形</span>
+                </label>
+                <label class="shape-option">
+                  <input type="radio" name="imageShape" value="square">
+                  <span>方形</span>
+                </label>
+                <label class="shape-option">
+                  <input type="radio" name="imageShape" value="circle">
+                  <span>圆形</span>
+                </label>
+              </div>
+            </fieldset>
           </div>
 
           <p class="form-note">生成浅灰骨架屏风格的 PNG，占位图中央会显示尺寸或自定义文字。</p>
@@ -228,12 +250,265 @@
 
           <div class="summary-strip" aria-live="polite">
             <span id="image-summary-size">800 x 450</span>
-            <span>骨架屏占位图</span>
+            <span id="image-summary-shape">矩形占位图</span>
           </div>
 
           <div class="image-preview-shell">
             <canvas id="mock-image-canvas" width="800" height="450" aria-label="图片占位图预览"></canvas>
           </div>
+        </section>
+      </section>
+
+      <section class="workspace tool-panel" id="panel-general" role="tabpanel" aria-labelledby="tab-general" hidden>
+        <form class="control-panel" id="general-form">
+          <div class="panel-heading">
+            <p class="eyebrow">通用字段</p>
+            <h2>生成表单常见值</h2>
+          </div>
+
+          <div class="settings-grid">
+            <label class="input-field" for="general-count">
+              <span>生成数量</span>
+              <input id="general-count" type="number" min="1" max="300" value="20" inputmode="numeric">
+            </label>
+
+            <label class="input-field" for="general-kind">
+              <span>字段类型</span>
+              <select id="general-kind">
+                <option value="all">全量字段</option>
+                <option value="string">随机字符串</option>
+                <option value="number">数字</option>
+                <option value="datetime">日期时间</option>
+                <option value="web">URL / IP</option>
+                <option value="color">颜色值</option>
+                <option value="enum">枚举 / 布尔 / 空值</option>
+              </select>
+            </label>
+          </div>
+
+          <p class="form-note">用于快速填充输入框、筛选器、配置项和边界状态字段。</p>
+
+          <button class="generate-button" type="submit">
+            生成通用字段
+            <span aria-hidden="true">→</span>
+          </button>
+        </form>
+
+        <section class="result-panel" aria-labelledby="general-result-title">
+          <div class="result-header">
+            <div>
+              <p class="eyebrow">输出结果</p>
+              <h2 id="general-result-title">通用字段预览</h2>
+            </div>
+            <div class="result-actions">
+              <button class="ghost-button" type="button" id="copy-general-json">复制 JSON</button>
+              <button class="ghost-button" type="button" id="copy-general-csv">复制 CSV</button>
+              <button class="ghost-button" type="button" id="download-general-csv">下载 CSV</button>
+            </div>
+          </div>
+
+          <div class="summary-strip" aria-live="polite">
+            <span id="general-summary-count">0 条记录</span>
+            <span id="general-summary-kind">全量字段</span>
+          </div>
+
+          <div class="table-wrap" id="general-table-wrap"></div>
+
+          <details class="json-drawer">
+            <summary>JSON 原文</summary>
+            <pre id="general-json-output">[]</pre>
+          </details>
+        </section>
+      </section>
+
+      <section class="workspace tool-panel" id="panel-account" role="tabpanel" aria-labelledby="tab-account" hidden>
+        <form class="control-panel" id="account-form">
+          <div class="panel-heading">
+            <p class="eyebrow">账号权限</p>
+            <h2>生成账号与权限样本</h2>
+          </div>
+
+          <div class="settings-grid">
+            <label class="input-field" for="account-count">
+              <span>生成数量</span>
+              <input id="account-count" type="number" min="1" max="300" value="20" inputmode="numeric">
+            </label>
+
+            <label class="input-field" for="account-role-mode">
+              <span>角色策略</span>
+              <select id="account-role-mode">
+                <option value="random">随机</option>
+                <option value="admin">管理员</option>
+                <option value="operator">运营</option>
+                <option value="viewer">只读</option>
+                <option value="service">服务账号</option>
+              </select>
+            </label>
+          </div>
+
+          <p class="form-note">包含用户名、邮箱、测试密码、角色、权限码、API Key 和假 Token。</p>
+
+          <button class="generate-button" type="submit">
+            生成账号数据
+            <span aria-hidden="true">→</span>
+          </button>
+        </form>
+
+        <section class="result-panel" aria-labelledby="account-result-title">
+          <div class="result-header">
+            <div>
+              <p class="eyebrow">输出结果</p>
+              <h2 id="account-result-title">账号预览</h2>
+            </div>
+            <div class="result-actions">
+              <button class="ghost-button" type="button" id="copy-account-json">复制 JSON</button>
+              <button class="ghost-button" type="button" id="copy-account-csv">复制 CSV</button>
+              <button class="ghost-button" type="button" id="download-account-csv">下载 CSV</button>
+            </div>
+          </div>
+
+          <div class="summary-strip" aria-live="polite">
+            <span id="account-summary-count">0 条记录</span>
+            <span id="account-summary-kind">随机角色</span>
+          </div>
+
+          <div class="table-wrap" id="account-table-wrap"></div>
+
+          <details class="json-drawer">
+            <summary>JSON 原文</summary>
+            <pre id="account-json-output">[]</pre>
+          </details>
+        </section>
+      </section>
+
+      <section class="workspace tool-panel" id="panel-business" role="tabpanel" aria-labelledby="tab-business" hidden>
+        <form class="control-panel" id="business-form">
+          <div class="panel-heading">
+            <p class="eyebrow">业务数据</p>
+            <h2>生成订单、商品和任务</h2>
+          </div>
+
+          <div class="settings-grid">
+            <label class="input-field" for="business-count">
+              <span>生成数量</span>
+              <input id="business-count" type="number" min="1" max="300" value="20" inputmode="numeric">
+            </label>
+
+            <label class="input-field" for="business-domain">
+              <span>业务场景</span>
+              <select id="business-domain">
+                <option value="all">综合业务</option>
+                <option value="order">订单支付</option>
+                <option value="product">商品库存</option>
+                <option value="task">工单任务</option>
+              </select>
+            </label>
+          </div>
+
+          <p class="form-note">适合后台列表、订单流、商品页、工单系统和 Demo 数据填充。</p>
+
+          <button class="generate-button" type="submit">
+            生成业务数据
+            <span aria-hidden="true">→</span>
+          </button>
+        </form>
+
+        <section class="result-panel" aria-labelledby="business-result-title">
+          <div class="result-header">
+            <div>
+              <p class="eyebrow">输出结果</p>
+              <h2 id="business-result-title">业务预览</h2>
+            </div>
+            <div class="result-actions">
+              <button class="ghost-button" type="button" id="copy-business-json">复制 JSON</button>
+              <button class="ghost-button" type="button" id="copy-business-csv">复制 CSV</button>
+              <button class="ghost-button" type="button" id="download-business-csv">下载 CSV</button>
+            </div>
+          </div>
+
+          <div class="summary-strip" aria-live="polite">
+            <span id="business-summary-count">0 条记录</span>
+            <span id="business-summary-kind">综合业务</span>
+          </div>
+
+          <div class="table-wrap" id="business-table-wrap"></div>
+
+          <details class="json-drawer">
+            <summary>JSON 原文</summary>
+            <pre id="business-json-output">[]</pre>
+          </details>
+        </section>
+      </section>
+
+      <section class="workspace tool-panel" id="panel-api" role="tabpanel" aria-labelledby="tab-api" hidden>
+        <form class="control-panel" id="api-form">
+          <div class="panel-heading">
+            <p class="eyebrow">接口响应</p>
+            <h2>生成 API 返回体</h2>
+          </div>
+
+          <div class="settings-grid">
+            <label class="input-field" for="api-method">
+              <span>请求方法</span>
+              <select id="api-method">
+                <option value="GET">GET</option>
+                <option value="POST">POST</option>
+                <option value="PUT">PUT</option>
+                <option value="DELETE">DELETE</option>
+              </select>
+            </label>
+
+            <label class="input-field" for="api-status">
+              <span>响应状态</span>
+              <select id="api-status">
+                <option value="success">成功</option>
+                <option value="empty">空列表</option>
+                <option value="validation">参数错误</option>
+                <option value="unauthorized">未授权</option>
+                <option value="server">服务异常</option>
+              </select>
+            </label>
+
+            <label class="input-field" for="api-endpoint">
+              <span>接口路径</span>
+              <input id="api-endpoint" type="text" value="/api/mock/items">
+            </label>
+
+            <label class="input-field" for="api-page-size">
+              <span>数据条数</span>
+              <input id="api-page-size" type="number" min="0" max="100" value="10" inputmode="numeric">
+            </label>
+          </div>
+
+          <p class="form-note">输出标准 code/message/data/pagination/error 结构，便于联调和前端空态测试。</p>
+
+          <button class="generate-button" type="submit">
+            生成接口响应
+            <span aria-hidden="true">→</span>
+          </button>
+        </form>
+
+        <section class="result-panel" aria-labelledby="api-result-title">
+          <div class="result-header">
+            <div>
+              <p class="eyebrow">输出结果</p>
+              <h2 id="api-result-title">响应体预览</h2>
+            </div>
+            <div class="result-actions">
+              <button class="ghost-button" type="button" id="copy-api-json">复制 JSON</button>
+              <button class="ghost-button" type="button" id="download-api-json">下载 JSON</button>
+            </div>
+          </div>
+
+          <div class="summary-strip" aria-live="polite">
+            <span id="api-summary-status">200 OK</span>
+            <span id="api-summary-endpoint">GET /api/mock/items</span>
+          </div>
+
+          <details class="json-drawer api-drawer" open>
+            <summary>JSON 原文</summary>
+            <pre id="api-json-output">{}</pre>
+          </details>
         </section>
       </section>
 

@@ -377,6 +377,61 @@ h2 {
   align-items: center;
 }
 
+.shape-field {
+  display: grid;
+  grid-column: 1 / -1;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  color: var(--muted);
+  font-size: 0.86rem;
+  font-weight: 800;
+}
+
+.shape-field legend {
+  padding: 0;
+}
+
+.shape-options {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.shape-option {
+  position: relative;
+  min-height: 3.1rem;
+}
+
+.shape-option input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+}
+
+.shape-option span {
+  display: grid;
+  height: 100%;
+  place-items: center;
+  border: 1px solid var(--line);
+  background: var(--surface-raised);
+  color: var(--ink);
+  font-weight: 900;
+  transition: transform 160ms var(--ease-out), border-color 160ms var(--ease-out), background 160ms var(--ease-out), color 160ms var(--ease-out);
+}
+
+.shape-option input:checked + span {
+  border-color: var(--seal);
+  background: oklch(94% 0.045 45);
+  color: var(--seal-deep);
+}
+
+.shape-option input:focus-visible + span {
+  outline: 3px solid oklch(67% 0.16 45);
+  outline-offset: 3px;
+}
+
 .input-field {
   display: grid;
   gap: var(--space-2);
@@ -646,6 +701,11 @@ tbody tr:nth-child(even) td {
   image-rendering: pixelated;
 }
 
+#mock-image-canvas.is-circle {
+  border-color: transparent;
+  box-shadow: none;
+}
+
 .json-drawer summary {
   min-height: 2.9rem;
   padding: var(--space-3) var(--space-4);
@@ -707,6 +767,10 @@ pre {
   .tool-tab:not(.is-active):hover {
     background: oklch(91% 0.035 80);
     color: var(--ink);
+  }
+
+  .shape-option:hover span {
+    transform: translateY(-2px);
   }
 
   .ghost-button:not(:disabled):hover {
