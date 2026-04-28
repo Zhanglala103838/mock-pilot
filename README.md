@@ -2,7 +2,7 @@
 
 English | [中文](#中文)
 
-A zero-dependency static web app for generating common mock assets: user profiles, UUIDs, and downloadable placeholder images.
+A zero-dependency static web app for generating common mock assets: user profiles, UUIDs, images, general fields, accounts, business data, and API responses.
 
 ## Features
 
@@ -66,7 +66,7 @@ node --check app.js
 
 ## 中文
 
-一个零依赖静态 Web 页面，用于生成常用 mock 资产：个人资料、UUID 和可下载图片占位图。
+一个零依赖静态 Web 页面，用于生成常用 mock 资产：个人资料、UUID、图片、通用字段、账号、业务数据和接口响应。
 
 ## 功能
 
