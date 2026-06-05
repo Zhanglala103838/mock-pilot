@@ -1,0 +1,26 @@
+/* 瑚琏 token 在最前（anti-FOUC inline script 依赖变量已就位） */
+@import "@hulianui/tokens/tokens.css";
+/* Tailwind v4 + 瑚琏 preset（语义 token → 工具类，dark variant 绑 data-theme） */
+@import "@hulianui/tokens/preset.css";
+
+/* 让消费方 Tailwind 扫到 @hulianui/ui 源码里的 className。
+   dev：直指本地软链的真实源码路径（避开 node_modules symlink glob 不跟随问题）。
+   prod（pnpm use:registry 后）：registry 安装到 node_modules。 */
+@source "../../hulian/packages/ui/src/**/*.{ts,tsx}";
+@source "../node_modules/@hulianui/ui/src/**/*.{ts,tsx}";
+
+html,
+body,
+#root {
+  min-height: 100dvh;
+}
+html,
+body {
+  background: var(--color-bg);
+  color: var(--color-foreground);
+}
+body {
+  margin: 0;
+  font-family: ui-sans-serif, system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}

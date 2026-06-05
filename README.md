@@ -1,130 +1,69 @@
-# Mock Pilot
+# Mock Pilot · Mock 数据工作台
 
-English | [中文](#中文)
+一个 **100% 用 [`@hulianui/ui`](https://github.com/hulianui/hulian) 搭建** 的 mock 数据工作台。生成个人档案、账号权限、业务数据、通用字段、UUID、占位图、接口响应，支持表格 / JSON / 卡片三视图预览、逐格复制、模板库、历史记录，以及 JSON / CSV / SQL INSERT / TS interface 多格式导出。
 
-A zero-dependency static web app for generating common mock assets: user profiles, UUIDs, images, general fields, accounts, business data, and API responses.
+> 本项目同时是 `@hulianui/ui` 的**真实场景 dogfood 载体**：缺组件就回库加，组件有问题回库改源码，不在本项目里打 CSS 补丁。
 
-## Features
+## 技术栈
 
-- Select exactly which fields to generate, including name, gender, phone number, ID number, region, address, company, email, occupation, birth date, and age.
-- Generate Mainland China style mobile numbers using common mobile prefixes.
-- Generate 18-digit Chinese resident ID numbers with region code, birth date, gender-aware sequence code, and GB 11643 checksum.
-- Optionally append `(测)` to generated names for test-account identification.
-- Preview data in a responsive table, copy individual cell values, copy JSON, copy CSV, or download CSV.
-- Switch between tabs for personal, UUID, image, general field, account, business, and API response mock data.
-- Generate UUID v4 values in standard, uppercase, or compact 32-character formats.
-- Create a skeleton-style PNG placeholder image with configurable width, height, rectangle/square/circle shape, preview, and download.
-- Generate common form values such as strings, numbers, dates, URLs, IPs, colors, enums, booleans, and null-like values.
-- Generate account and permission data including usernames, emails, roles, permission codes, API keys, and fake tokens.
-- Generate product, order, payment, inventory, and task data for business UI testing.
-- Generate API response bodies for success, empty-list, validation-error, unauthorized, and server-error states.
-- Export JSON with English keys such as `name`, `phone`, `idNumber`, and `company`.
+- **Vite + React 19 + TypeScript** —— 纯客户端 SPA，构建为静态文件
+- **`@hulianui/ui`** —— 全部 UI 用瑚琏组件（AdminLayout / ProTable / Segmented / JsonViewer / DocumentSheet / Drawer / Dialog / Card / Masonry / Tag / Toast / 全套表单件 …）
+- **`@hulianui/tokens`** —— Tailwind v4 preset + 设计令牌，深浅色主题
+- **Vitest** —— 生成逻辑纯函数单测（含 GB 11643 身份证校验位国标向量）
 
-## Usage
-
-Open `index.html` directly in a browser, or run a local static server:
-
-```bash
-python3 -m http.server 49173
-```
-
-Then visit:
-
-```text
-http://localhost:49173
-```
-
-## Data Format Notes
-
-- Phone numbers are 11-digit Mainland China mobile-style values.
-- ID numbers follow the 18-digit structure and checksum algorithm defined by GB 11643.
-- Company names are generated from city name, brand-like prefix, industry term, and legal suffix.
-- UUIDs use browser crypto APIs when available, with a local fallback.
-- Placeholder images are generated locally with Canvas and downloaded as PNG files.
-- API responses use a conventional `code/message/data/pagination/error` structure.
-- Generated data is fictional and intended only for testing, demos, and prototype filling.
-
-## Project Structure
-
-```text
-.
-├── index.html
-├── styles.css
-├── app.js
-└── README.md
-```
-
-## Development
-
-This project has no build step and no runtime dependencies. Edit the files directly and refresh the browser.
-
-To check JavaScript syntax:
-
-```bash
-node --check app.js
-```
-
-## 中文
-
-一个零依赖静态 Web 页面，用于生成常用 mock 资产：个人资料、UUID、图片、通用字段、账号、业务数据和接口响应。
-
-## 功能
-
-- 可按需勾选字段，包括姓名、性别、手机号、身份证号、地区、地址、所属公司、邮箱、职业、出生日期和年龄。
-- 手机号使用常见大陆移动号段生成 11 位号码。
-- 身份证号按 18 位结构生成，包含地址码、出生日期、性别顺序码和 GB 11643 校验位。
-- 可选在姓名后追加 `(测)`，用于标记测试账号。
-- 支持表格预览、单元格逐项复制、复制 JSON、复制 CSV 和下载 CSV。
-- 使用 tab 区分个人 Mock、UUID Mock、图片 Mock、通用 Mock、账号 Mock、业务 Mock 和接口 Mock。
-- 支持批量生成 UUID v4，可切换大写和 32 位无连字符格式。
-- 支持设置图片宽高和矩形/方形/圆形，预览并下载浅灰骨架屏风格 PNG，占位图上会显示尺寸或自定义文字。
-- 支持生成字符串、数字、日期时间、URL、IP、颜色、枚举、布尔和空值类通用字段。
-- 支持生成用户名、邮箱、测试密码、角色、权限码、API Key 和假 Token。
-- 支持生成商品、订单、支付、库存和工单任务类业务数据。
-- 支持生成成功、空列表、参数错误、未授权和服务异常接口响应体。
-- JSON 原文使用英文 key 输出，例如 `name`、`phone`、`idNumber`、`company`。
-
-## 使用
-
-直接在浏览器打开 `index.html`，或在目录内启动本地静态服务：
-
-```bash
-python3 -m http.server 49173
-```
-
-然后访问：
-
-```text
-http://localhost:49173
-```
-
-## 生成规则
-
-- 手机号：11 位大陆移动号码格式，使用常见号段前缀。
-- 身份证号：18 位结构，包含地址码、出生日期、性别顺序码和 GB 11643 校验位。
-- 所属公司：按城市名、字号、行业和公司后缀组合生成虚拟公司名。
-- UUID：默认生成 v4 格式，浏览器支持时使用 Web Crypto。
-- 图片：使用 Canvas 在本地生成 PNG，不上传文件。
-- 账号与 Token：仅为测试字符串，不可用于真实认证。
-- 接口响应：生成标准 JSON 结构，便于联调和状态页验证。
-- 数据仅用于测试和演示，不对应真实个人。
-
-## 项目结构
-
-```text
-.
-├── index.html
-├── styles.css
-├── app.js
-└── README.md
-```
+数据全部在浏览器本地生成，**零后端、零远程请求**。
 
 ## 开发
 
-项目没有构建步骤，也没有运行时依赖。直接修改文件并刷新浏览器即可。
+```bash
+pnpm install        # 依赖默认软链本地 ../hulian/packages/{ui,tokens}
+pnpm dev            # http://localhost:49173
+pnpm test           # 生成逻辑单测
+pnpm typecheck      # 仅校验本项目代码（库源码 typecheck 在其自身仓库）
+```
 
-检查 JavaScript 语法：
+### 库消费机制（dev 软链 / prod 线上）
+
+- **本地开发**：`package.json` 依赖用 `link:../hulian/packages/*` 软链本地源码，改库源码 Vite HMR 立即生效。
+- **发版部署**：`pnpm use:registry` 把依赖切到线上 pin 版本（`.npmrc` 路由 `@hulianui:registry`，需 `NODE_AUTH_TOKEN` 鉴权 GitHub Packages）；回退用 `pnpm use:local`。
+
+## 构建与部署
 
 ```bash
-node --check app.js
+pnpm build                  # 输出静态站到 dist/
+node scripts/deploy.mjs     # 构建 + rsync 到生产 nginx
 ```
+
+部署目标：`60.205.112.50:/www/wwwroot/https:/mock.haloritual.com` → <https://mock.haloritual.com>
+
+视图状态同步到 `?tool=` query，始终是根 `index.html`，**nginx 零额外配置**（无需 SPA fallback）。
+
+## 目录结构
+
+```text
+src/
+├── lib/                # 纯逻辑（无 UI）
+│   ├── random.ts       # 可注入 RNG（mulberry32 测试可复现）
+│   ├── datetime.ts     # 日期工具
+│   ├── constants.ts    # 地区/姓氏/号段/角色等数据表 + 字段标签
+│   ├── generators/     # personal(GB11643) / uuid / general / account / business / api
+│   ├── image.ts        # 占位图 Canvas 绘制
+│   ├── export.ts       # JSON / CSV / SQL / TS interface 导出
+│   └── clipboard.ts    # 复制 / 下载
+├── workbench/          # 共享工作台壳（RecordWorkbench / 预览 / 导出抽屉 / 卡片视图）
+├── panels/             # 7 大生成器面板 + 模板库 + 历史
+├── store/workspace.ts  # localStorage 模板库 + 历史（外部 store）
+├── app/tools.tsx       # 工具注册表 + 侧栏菜单
+└── App.tsx             # AdminLayout 骨架 + 主题 + Toast
+```
+
+## 数据规则
+
+- **手机号**：11 位大陆移动号段。
+- **身份证号**：18 位结构，地址码 + 出生日期 + 性别顺序码（男奇女偶）+ **GB 11643 校验位**。
+- **公司名**：城市 + 字号 + 行业 + 后缀组合。
+- **UUID**：v4，浏览器支持时用 Web Crypto，可切大写 / 32 位无连字符。
+- **占位图**：Canvas 本地生成骨架屏风格 PNG，矩形 / 方形 / 圆形。
+- **接口响应**：标准 `code / message / data / pagination / error` 结构。
+
+生成数据均为虚构，仅供测试、演示和原型填充。
