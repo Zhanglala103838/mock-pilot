@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { BookmarkPlus } from "lucide-react";
 import {
   CheckboxGroup, Checkbox, NumberField, Select, SelectTrigger, SelectContent, SelectItem,
-  Switch, DateRangePicker, Field, Button, Dialog, DialogContent, DialogClose, Input, toast,
+  Switch, DateRangePicker, Field, Button, Dialog, DialogContent, DialogClose, Input, toast, Stack, Text,
 } from "@hulianui/ui";
 import { Random } from "../lib/random";
 import { createProfiles, PERSONAL_FIELDS, type Gender } from "../lib/generators/personal";
@@ -81,11 +81,11 @@ export function PersonalPanel() {
   const config = (
     <ConfigStack>
       <Section title="字段清单">
-        <div className="mb-1 flex flex-wrap gap-1.5">
+        <Stack direction="row" wrap gap={1.5} className="mb-1">
           <Button variant="ghost" size="sm" onClick={() => setSelected(PRESETS.core)}>常用四项</Button>
           <Button variant="ghost" size="sm" onClick={() => setSelected(PRESETS.full)}>全量</Button>
           <Button variant="ghost" size="sm" onClick={() => setSelected([])}>清空</Button>
-        </div>
+        </Stack>
         <CheckboxGroup value={selected} onValueChange={setSelected} className="grid grid-cols-2 gap-x-2 gap-y-1.5">
           {PERSONAL_FIELDS.map((f) => (
             <Checkbox key={f.key} value={f.key} label={f.label} />
@@ -120,10 +120,10 @@ export function PersonalPanel() {
         <DateRangePicker value={range} onValueChange={(v) => v && setRange(v)} minDate="1950-01-01" maxDate="2025-12-31" />
       </Section>
 
-      <label className="flex items-center justify-between text-sm text-foreground">
-        <span>姓名追加 (测)</span>
+      <Stack as="label" direction="row" align="center" justify="between">
+        <Text as="span" size="sm">姓名追加 (测)</Text>
         <Switch checked={testSuffix} onCheckedChange={setTestSuffix} />
-      </label>
+      </Stack>
 
       <RegenerateButton onClick={commit} />
 

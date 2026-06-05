@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { NumberField, Switch, Field } from "@hulianui/ui";
+import { NumberField, Switch, Field, Stack, Text } from "@hulianui/ui";
 import { Random } from "../lib/random";
 import { createUuids, uuidFormatLabel } from "../lib/generators/uuid";
 import { RecordWorkbench } from "../workbench/RecordWorkbench";
@@ -27,14 +27,14 @@ export function UuidPanel() {
       <Field label="生成数量">
         <NumberField value={count} onValueChange={(v) => setCount(v ?? 1)} min={1} max={500} step={1} />
       </Field>
-      <label className="flex items-center justify-between text-sm text-foreground">
-        <span>大写</span>
+      <Stack as="label" direction="row" align="center" justify="between">
+        <Text as="span" size="sm">大写</Text>
         <Switch checked={uppercase} onCheckedChange={setUppercase} />
-      </label>
-      <label className="flex items-center justify-between text-sm text-foreground">
-        <span>32 位无连字符</span>
+      </Stack>
+      <Stack as="label" direction="row" align="center" justify="between">
+        <Text as="span" size="sm">32 位无连字符</Text>
         <Switch checked={compact} onCheckedChange={setCompact} />
-      </label>
+      </Stack>
       <RegenerateButton onClick={commit} />
     </ConfigStack>
   );

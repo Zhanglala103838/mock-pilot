@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Download } from "lucide-react";
 import {
   NumberField, Select, SelectTrigger, SelectContent, SelectItem, Field, Input,
-  Card, JsonViewer, Button, Tag,
+  Card, JsonViewer, Button, Tag, Stack, Text,
 } from "@hulianui/ui";
 import { Random } from "../lib/random";
 import {
@@ -30,7 +30,7 @@ export function ApiPanel() {
   const json = JSON.stringify(response, null, 2);
 
   return (
-    <div className="flex flex-col gap-4 lg:flex-row lg:items-start">
+    <Stack gap={4} className="lg:flex-row lg:items-start">
       <Card className="shrink-0 p-4 lg:sticky lg:top-4 lg:w-72">
         <ConfigStack>
           <Field label="请求方法">
@@ -58,23 +58,23 @@ export function ApiPanel() {
         </ConfigStack>
       </Card>
 
-      <div className="min-w-0 flex-1">
-        <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-2 text-sm text-muted">
+      <Stack gap={0} className="min-w-0 flex-1">
+        <Stack direction="row" wrap align="center" justify="between" gap={3} className="mb-3">
+          <Stack direction="row" align="center" gap={2}>
             <Tag tone={httpStatus < 400 ? "success" : "danger"} dot>{httpStatus}</Tag>
-            <span className="font-mono">{method} {endpoint}</span>
-          </div>
-          <div className="flex gap-2">
+            <Text as="span" size="sm" tone="muted" className="font-mono">{method} {endpoint}</Text>
+          </Stack>
+          <Stack direction="row" gap={2}>
             <Button variant="outline" size="sm" onClick={() => copyText(json, "接口 JSON 已复制")}>复制 JSON</Button>
             <Button size="sm" onClick={() => downloadTextFile(json, `mock-api-${Date.now()}.json`, "application/json;charset=utf-8")}>
               <Download className="size-4" /> 下载
             </Button>
-          </div>
-        </div>
+          </Stack>
+        </Stack>
         <Card className="overflow-auto p-4">
           <JsonViewer data={response} rootName="response" defaultExpandedDepth={3} />
         </Card>
-      </div>
-    </div>
+      </Stack>
+    </Stack>
   );
 }

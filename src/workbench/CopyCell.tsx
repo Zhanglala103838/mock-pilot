@@ -1,15 +1,15 @@
 import { Copy } from "lucide-react";
-import { Button } from "@hulianui/ui";
+import { Button, Stack, Text } from "@hulianui/ui";
 import { copyText } from "../lib/clipboard";
 import { formatValue } from "../lib/export";
 
 export function CopyCell({ value, label }: { value: unknown; label: string }) {
   const text = formatValue(value);
   return (
-    <span className="group/cell inline-flex max-w-full items-center gap-1">
-      <span className="truncate font-mono text-[13px] text-foreground" title={text}>
+    <Stack direction="row" align="center" gap={1} inline className="group/cell max-w-full">
+      <Text as="span" truncate className="font-mono text-[13px]" title={text}>
         {text}
-      </span>
+      </Text>
       <Button
         variant="ghost"
         size="iconSm"
@@ -20,6 +20,6 @@ export function CopyCell({ value, label }: { value: unknown; label: string }) {
       >
         <Copy className="size-3.5" />
       </Button>
-    </span>
+    </Stack>
   );
 }

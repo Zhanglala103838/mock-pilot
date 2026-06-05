@@ -1,7 +1,7 @@
 import { useMemo, useState, type ReactNode } from "react";
 import { Download, Table2, Braces, LayoutGrid } from "lucide-react";
 import {
-  ProTable, JsonViewer, Segmented, Button, Empty, Card,
+  ProTable, JsonViewer, Segmented, Button, Empty, Card, Stack, Text,
   type ColumnDef,
 } from "@hulianui/ui";
 import { outputLabel } from "../lib/constants";
@@ -39,7 +39,7 @@ function buildColumns(records: Row[]): ColumnDef<Row, unknown>[] {
     cols.unshift({
       id: "__no",
       header: "#",
-      cell: ({ row }) => <span className="font-mono text-xs text-muted">{row.index + 1}</span>,
+      cell: ({ row }) => <Text as="span" size="xs" tone="muted" className="font-mono">{row.index + 1}</Text>,
     });
   }
   return cols;
@@ -59,15 +59,15 @@ export function RecordWorkbench({ config, records, name, summary, emptyHint }: R
   const empty = records.length === 0;
 
   return (
-    <div className="flex flex-col gap-4 lg:flex-row lg:items-start">
+    <Stack gap={4} className="lg:flex-row lg:items-start">
       {/* 左·配置区 */}
       <Card className="shrink-0 p-4 lg:sticky lg:top-4 lg:w-72">{config}</Card>
 
       {/* 主·预览区 */}
-      <div className="min-w-0 flex-1">
-        <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
-          <div className="text-sm text-muted">{summary}</div>
-          <div className="flex items-center gap-2">
+      <Stack gap={0} className="min-w-0 flex-1">
+        <Stack direction="row" wrap align="center" justify="between" gap={3} className="mb-3">
+          <Text size="sm" tone="muted">{summary}</Text>
+          <Stack direction="row" align="center" gap={2}>
             <Segmented
               size="sm"
               aria-label="预览视图"
@@ -88,8 +88,8 @@ export function RecordWorkbench({ config, records, name, summary, emptyHint }: R
             <Button size="sm" disabled={empty} onClick={() => setExportOpen(true)}>
               <Download className="size-4" /> 导出
             </Button>
-          </div>
-        </div>
+          </Stack>
+        </Stack>
 
         {empty ? (
           <Empty title="还没有生成数据" description={emptyHint ?? "在左侧调整配置后点击「生成」。"} />
@@ -112,9 +112,9 @@ export function RecordWorkbench({ config, records, name, summary, emptyHint }: R
         ) : (
           <CardView records={records} />
         )}
-      </div>
+      </Stack>
 
       <ExportDrawer open={exportOpen} onOpenChange={setExportOpen} records={records} name={name} />
-    </div>
+    </Stack>
   );
 }

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Download } from "lucide-react";
-import { NumberField, Segmented, Field, Input, Card, Button } from "@hulianui/ui";
+import { NumberField, Segmented, Field, Input, Card, Button, Stack, Text } from "@hulianui/ui";
 import {
   drawMockImage, clampDimension, SHAPE_LABELS, type ImageShape,
 } from "../lib/image";
@@ -44,7 +44,7 @@ export function ImagePanel() {
   };
 
   return (
-    <div className="flex flex-col gap-4 lg:flex-row lg:items-start">
+    <Stack gap={4} className="lg:flex-row lg:items-start">
       <Card className="shrink-0 p-4 lg:sticky lg:top-4 lg:w-72">
         <ConfigStack>
           <Field label="宽度 (px)">
@@ -70,16 +70,18 @@ export function ImagePanel() {
         </ConfigStack>
       </Card>
 
-      <div className="min-w-0 flex-1">
-        <div className="mb-3 text-sm text-muted">{w} x {h} · {SHAPE_LABELS[shape]}占位图（Canvas 本地生成，不上传）</div>
-        <Card className="flex items-center justify-center overflow-auto bg-surface-hover p-6">
-          <canvas
-            ref={canvasRef}
-            className="max-w-full rounded-[var(--radius)]"
-            style={{ width: "auto", maxHeight: "60vh", aspectRatio: `${w} / ${h}` }}
-          />
+      <Stack gap={0} className="min-w-0 flex-1">
+        <Text size="sm" tone="muted" className="mb-3">{w} x {h} · {SHAPE_LABELS[shape]}占位图（Canvas 本地生成，不上传）</Text>
+        <Card className="overflow-auto bg-surface-hover p-6">
+          <Stack align="center" justify="center">
+            <canvas
+              ref={canvasRef}
+              className="max-w-full rounded-[var(--radius)]"
+              style={{ width: "auto", maxHeight: "60vh", aspectRatio: `${w} / ${h}` }}
+            />
+          </Stack>
         </Card>
-      </div>
-    </div>
+      </Stack>
+    </Stack>
   );
 }

@@ -1,5 +1,5 @@
 import { ExternalLink, Trash2 } from "lucide-react";
-import { Card, Button, Tag, Empty, RelativeTime } from "@hulianui/ui";
+import { Card, Button, Tag, Empty, RelativeTime, Stack, Text } from "@hulianui/ui";
 import { useHistory, workspace, requestNavigate } from "../store/workspace";
 
 export function HistoryPanel() {
@@ -15,27 +15,29 @@ export function HistoryPanel() {
   }
 
   return (
-    <div className="flex flex-col gap-3">
-      <div className="flex items-center justify-between">
-        <div className="text-sm text-muted">最近 {history.length} 批生成</div>
+    <Stack gap={3}>
+      <Stack direction="row" align="center" justify="between">
+        <Text size="sm" tone="muted">最近 {history.length} 批生成</Text>
         <Button size="sm" variant="outline" tone="danger" onClick={() => workspace.clearHistory()}>
           <Trash2 className="size-4" /> 清空
         </Button>
-      </div>
-      <div className="flex flex-col gap-2">
+      </Stack>
+      <Stack gap={2}>
         {history.map((entry) => (
-          <Card key={entry.id} className="flex items-center justify-between gap-3 p-3">
-            <div className="flex items-center gap-3">
-              <Tag size="sm" tone="brand">{entry.toolLabel}</Tag>
-              <span className="text-sm text-foreground">生成 {entry.count} 条</span>
-              <span className="text-xs text-muted"><RelativeTime value={entry.createdAt} /></span>
-            </div>
-            <Button size="sm" variant="ghost" onClick={() => requestNavigate(entry.tool)}>
-              <ExternalLink className="size-4" /> 打开
-            </Button>
+          <Card key={entry.id}>
+            <Stack direction="row" align="center" justify="between" gap={3} className="p-3">
+              <Stack direction="row" align="center" gap={3}>
+                <Tag size="sm" tone="brand">{entry.toolLabel}</Tag>
+                <Text as="span" size="sm">生成 {entry.count} 条</Text>
+                <Text as="span" size="xs" tone="muted"><RelativeTime value={entry.createdAt} /></Text>
+              </Stack>
+              <Button size="sm" variant="ghost" onClick={() => requestNavigate(entry.tool)}>
+                <ExternalLink className="size-4" /> 打开
+              </Button>
+            </Stack>
           </Card>
         ))}
-      </div>
-    </div>
+      </Stack>
+    </Stack>
   );
 }

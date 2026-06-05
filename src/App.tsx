@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import {
-  AdminLayout, ThemeProvider, ToastProvider, AnimatedThemeToggler, TooltipProvider, Empty,
+  AdminLayout, ThemeProvider, ToastProvider, AnimatedThemeToggler, TooltipProvider, Empty, Text,
 } from "@hulianui/ui";
 import type { NavMenuNode } from "@hulianui/ui";
 import { TOOLS, TOOL_KEYS, DEFAULT_TOOL, toolLabel } from "./app/tools";
@@ -67,21 +67,22 @@ export function App() {
       <TooltipProvider delay={300} closeDelay={0}>
         <AdminLayout
           menuItems={MENU}
-          logo={<span className="text-base font-bold text-primary">Mock Pilot</span>}
-          logoCollapsed={<span className="text-base font-bold text-primary">M</span>}
+          logo={<Text as="span" tone="primary" weight="bold">Mock Pilot</Text>}
+          logoCollapsed={<Text as="span" tone="primary" weight="bold">M</Text>}
           defaultActiveKey={active}
           activeKey={active}
           selectedKey={active}
           onMenuSelect={onActivate}
           onTabChange={onActivate}
-          breadcrumb={<span className="text-sm text-muted">Mock 工作台 / {toolLabel(active)}</span>}
+          breadcrumb={<Text as="span" size="sm" tone="muted">Mock 工作台 / {toolLabel(active)}</Text>}
           headerExtra={<AnimatedThemeToggler />}
         >
-          {/* keep-alive：全部面板常驻，仅切换可见，保留各自已生成的数据 */}
+          {/* keep-alive 挂载容器：全部面板常驻、仅 display 显隐保留各自数据。
+              这里必须用原生 hidden（display:none），不能用 Stack——其 flex 类会覆盖 hidden 属性。 */}
           {TOOL_KEYS.map((key) => {
             const Panel = PANELS[key];
             return (
-              <div key={key} hidden={key !== active} className={key === active ? "" : "hidden"}>
+              <div key={key} hidden={key !== active}>
                 {Panel ? <Panel /> : <Empty title="建设中" />}
               </div>
             );

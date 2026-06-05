@@ -1,14 +1,14 @@
 import type { ReactNode } from "react";
 import { RefreshCw } from "lucide-react";
-import { Button } from "@hulianui/ui";
+import { Button, Stack, Text } from "@hulianui/ui";
 
 /** 配置区里的一个带标题小节。 */
 export function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <div className="flex flex-col gap-2">
-      <div className="text-xs font-medium text-muted">{title}</div>
+    <Stack gap={2}>
+      <Text size="xs" tone="muted" weight="medium">{title}</Text>
       {children}
-    </div>
+    </Stack>
   );
 }
 
@@ -23,5 +23,5 @@ export function RegenerateButton({ onClick, children = "生成一批" }: { onCli
 
 /** 配置区竖直排布容器。 */
 export function ConfigStack({ children }: { children: ReactNode }) {
-  return <div className="flex flex-col gap-4">{children}</div>;
+  return <Stack gap={4}>{children}</Stack>;
 }
