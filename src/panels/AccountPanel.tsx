@@ -46,6 +46,7 @@ export function AccountPanel() {
       config={config}
       records={records}
       name="mock_accounts"
+      onReload={commit}
       summary={`${records.length} 条 · ${ACCOUNT_ROLE_LABELS[mode]}`}
     />
   );

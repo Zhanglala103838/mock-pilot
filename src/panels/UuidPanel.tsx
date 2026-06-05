@@ -44,6 +44,7 @@ export function UuidPanel() {
       config={config}
       records={records}
       name="mock_uuids"
+      onReload={commit}
       summary={`${records.length} 个 · ${uuidFormatLabel({ uppercase, compact })}`}
     />
   );

@@ -46,6 +46,7 @@ export function GeneralPanel() {
       config={config}
       records={records}
       name="mock_general"
+      onReload={commit}
       summary={`${records.length} 条 · ${GENERAL_KIND_LABELS[kind]}`}
     />
   );

@@ -155,6 +155,7 @@ export function PersonalPanel() {
       config={config}
       records={records}
       name="mock_users"
+      onReload={commit}
       summary={
         orderedFields.length === 0
           ? "未选择字段"

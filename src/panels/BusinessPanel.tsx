@@ -46,6 +46,7 @@ export function BusinessPanel() {
       config={config}
       records={records}
       name="mock_business"
+      onReload={commit}
       summary={`${records.length} 条 · ${BUSINESS_DOMAIN_LABELS[domain]}`}
     />
   );

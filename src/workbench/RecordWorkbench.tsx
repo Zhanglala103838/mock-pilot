@@ -24,6 +24,8 @@ export interface RecordWorkbenchProps {
   /** 概览文案（条数、字段等）。 */
   summary?: ReactNode;
   emptyHint?: string;
+  /** ProTable 工具栏刷新 → 重新生成一批。 */
+  onReload?: () => void;
 }
 
 function buildColumns(records: Row[]): ColumnDef<Row, unknown>[] {
@@ -45,7 +47,7 @@ function buildColumns(records: Row[]): ColumnDef<Row, unknown>[] {
   return cols;
 }
 
-export function RecordWorkbench({ config, records, name, summary, emptyHint }: RecordWorkbenchProps) {
+export function RecordWorkbench({ config, records, name, summary, emptyHint, onReload }: RecordWorkbenchProps) {
   const [view, setView] = useState<ViewMode>("table");
   const [page, setPage] = useState(1);
   const [exportOpen, setExportOpen] = useState(false);
@@ -98,6 +100,7 @@ export function RecordWorkbench({ config, records, name, summary, emptyHint }: R
             columns={columns}
             data={pageData}
             density="middle"
+            onReload={onReload}
             pagination={{
               page,
               pageSize: PAGE_SIZE,
